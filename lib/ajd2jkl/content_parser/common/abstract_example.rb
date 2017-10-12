@@ -17,7 +17,7 @@ module Ajd2jkl
                 }x
 
                 def analyze
-                    Ajd2jkl.verbose_say("Analyze Common/#{example_type}... ")
+                    Ajd2jkl.verbose_say("Analyzing Common/#{example_type}... ")
                     match = @@parser.match(@raw)
                     @type = match[:type] unless match[:type].nil?
                     @title = match[:title] unless match[:title].nil?

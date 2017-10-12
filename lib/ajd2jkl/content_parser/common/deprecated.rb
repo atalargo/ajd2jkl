@@ -8,7 +8,7 @@ module Ajd2jkl
                 attr_reader :description
 
                 def analyze
-                    Ajd2jkl.verbose_say('Analyze Common/Deprecated... ')
+                    Ajd2jkl.verbose_say('Analyzing Common/Deprecated... ')
                     @description = @raw.rstrip
                     @raw = nil
                 end

@@ -8,7 +8,7 @@ module Ajd2jkl
                 attr_reader :url
 
                 def analyze
-                    Ajd2jkl.verbose_say('Analyze Common/SampleRequest... ')
+                    Ajd2jkl.verbose_say('Analyzing Common/SampleRequest... ')
                     @url = @raw.gsub(/\s/, '').lstrip
                     Ajd2jkl.verbose_say(" Found url: `#{url}`")
                     @raw = nil

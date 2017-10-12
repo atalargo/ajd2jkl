@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
     spec.authors       = ['Florent Ruard-Dumaine']
     spec.email         = ['florent@daysofwonder.com']
 
-    spec.summary       = %q{'Command to parse file code using apidocjs comment to generate API docs in Jekyll format}
+    spec.summary       = %q{'Command to parse code files with apidocjs comments to generate API documentation in Jekyll format}
     spec.description   = %q{...}
     spec.homepage      = 'TODO: Put your gem\'s website or public repo URL here.'
     spec.license       = 'MIT'

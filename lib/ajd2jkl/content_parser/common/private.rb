@@ -8,7 +8,7 @@ module Ajd2jkl
                 attr_reader :version
 
                 def analyze
-                    Ajd2jkl.verbose_say('Analyze Common/Private... This could generate private API generation ')
+                    Ajd2jkl.verbose_say('Analyzing Common/Private... This could generate private API documentation ')
                     @raw = nil
                 end
             end
