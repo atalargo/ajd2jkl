@@ -29,8 +29,8 @@ module Ajd2jkl
                 # first line it's the @api {method} path [title]
 
                 match = API_PARSER.match line
-                raise "Parsing api don't have `path` part (RE: #{API_PARSER}) raw: #{@raw}" unless match && match[:path]
-                raise "Parsing api don't have `method` part (RE: #{API_PARSER}) raw: #{@raw}" unless match && match[:method]
+                raise "Missing `path` part of @api declaration (RE: #{API_PARSER}) raw: #{@raw}" unless match && match[:path]
+                raise "Missing `method` part of @api declaration (RE: #{API_PARSER}) raw: #{@raw}" unless match && match[:method]
                 @path = match[:path]
                 @method = match[:method]
                 @title = match[:title]

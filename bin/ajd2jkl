@@ -6,7 +6,7 @@ require 'commander'
 Commander.configure do
     program :name, 'ApiJSDoc 2 Jekyll'
     program :version, Ajd2jkl::VERSION
-    program :description, 'Command to parse file code using apidocjs comment to generate API docs in Jekyll format'
+    program :description, 'Command to parse code files with apidocjs comments to generate API documentation in Jekyll format'
     program :genlist, 'List all available generators and exit'
 
     global_option('--verbose')
@@ -22,8 +22,8 @@ Commander.configure do
 
     command :parse do |c|
         c.syntax = 'ajd2jkl parse [options] [src_dir ..]'
-        c.description = 'Parse the sources in given directories and generate the doc'
-        c.option '--dry-run', 'Only parse don\'t generate the doc'
+        c.description = 'Parse the source files in the given directories and generate the doc'
+        c.option '--dry-run', 'Parse only, don\'t generate any doc'
         c.option '--debug', 'Debug mode'
         c.option '--output STRING', String, 'Output directory default is \'./doc\''
         c.option '--imgs STRING', String, 'Images directory to import'
@@ -34,7 +34,7 @@ See command genlist for list of available generators"
         c.action do |args, options|
             options.default(output: './doc', dry_run: false, generator: 'jekyll')
             if args.count.zero?
-                say("<%= color('You should give at least one source directy', :red) %>")
+                say("<%= color('You should give at least one source directory', :red) %>")
                 command(:help).run(['parse'])
                 exit 1
             end

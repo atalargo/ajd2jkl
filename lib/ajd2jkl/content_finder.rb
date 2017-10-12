@@ -32,11 +32,11 @@ module Ajd2jkl
             end
 
             def check_file_name(ncontent, match = nil)
-                throw ::Error.new 'The class method `check_file_name` should be overrided'
+                throw ::Error.new 'The class method `check_file_name` should be overridden'
             end
 
             def self.parser
-                throw ::Error.new 'The class method `get_parser` should be overrided'
+                throw ::Error.new 'The class method `get_parser` should be overridden'
             end
         end
     end

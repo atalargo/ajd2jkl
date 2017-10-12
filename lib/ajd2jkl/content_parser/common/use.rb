@@ -8,7 +8,7 @@ module Ajd2jkl
                 attr_reader :name_of_defined
 
                 def analyze
-                    Ajd2jkl.verbose_say('Analyze Common/Use... ')
+                    Ajd2jkl.verbose_say('Analyzing Common/Use... ')
                     @name_of_defined = @raw.gsub(/\s/, '')
                     Ajd2jkl.verbose_say(" Found Use of predefined `#{@name_of_defined}`")
                     @raw = nil
