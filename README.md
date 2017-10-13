@@ -26,31 +26,33 @@ Or install it yourself as:
 Display:
 
 ```bash
-NAME:
-    ApiJSDoc 2 Jekyll
+ NAME:
 
-  DESCRIPTION:
+   ApiJSDoc 2 Jekyll
 
-    Command to parse file code using apidocjs comment to generate API docs in Jekyll format
+ DESCRIPTION:
 
-  COMMANDS:
+   Command to parse file code using apidocjs comment to generate API docs in Jekyll format
 
-    help  Display global or [command] help documentation
-    parse Parse the sources in given directories and generate the doc
+ COMMANDS:
 
-  GLOBAL OPTIONS:
+   genlist List all available generators and exit
+   help    Display global or [command] help documentation
+   parse   Parse the sources in given directories and generate the doc
 
-    --verbose
+ GLOBAL OPTIONS:
+
+   --verbose
 
 
-    -h, --help
-        Display help documentation
+   -h, --help
+       Display help documentation
 
-    -v, --version
-        Display version information
+   -v, --version
+       Display version information
 
-    -t, --trace
-        Display backtrace when an error occurs
+   -t, --trace
+       Display backtrace when an error occurs
 ```
 
 Sub command `parse` (it's the default command launched):
@@ -73,21 +75,52 @@ Display:
     Parse the sources in given directories and generate the doc
 
   OPTIONS:
-        
-    --dry-run 
+
+    --dry-run
         Only parse don't generate the doc
-        
-    --debug 
+
+    --debug
         Debug mode
-        
-    --output STRING 
+
+    --output STRING
         Output directory default is './doc'
-        
-    --imgs STRING 
+
+    --imgs STRING
         Images directory to import
-        
-    --config STRING 
+
+    --config STRING
         Configuration file. Json or YAML format
+
+    --generator STRING
+        Type of generate to use: Jekyll (default), swagger, etc. See command genlist for list of available generators
+```
+
+Sub command `genlist`
+```ajd2jkl genlist --help```
+
+```bash
+NAME:
+
+  genlist
+
+SYNOPSIS:
+
+  ajd2jkl genlist
+
+DESCRIPTION:
+
+  List all available generators and exit
+```
+
+Current output of `genlist`
+```ajd2jkl genlist```
+
+```bash
+Available generators are:
+
+- Jekyll: Use Jekyll to generate a static documentation website, option: jekyll
+
+Default generator is Jekyll
 ```
 
 ## Development
