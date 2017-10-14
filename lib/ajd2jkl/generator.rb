@@ -1,15 +1,13 @@
-
 require 'fileutils'
-# require 'ajd2jkl/generator/jekyll'
 
 module Ajd2jkl
     module Generator
         def self.list_generators
-            say "Available generators are:\n\n"
+            Ajd2jkl.say "Available generators are:\n\n"
             list_gen_mod.each do |gen|
-                say "- #{gen[:name]}: #{gen[:description]}, option: #{gen[:option]}"
+                Ajd2jkl.say "- #{gen[:name]}: #{gen[:description]}, option: #{gen[:option]}"
             end
-            say "\nDefault generator is Jekyll\n"
+            Ajd2jkl.say "\nDefault generator is Jekyll\n"
         end
 
         protected
@@ -35,7 +33,7 @@ module Ajd2jkl
 
                 @generator_def = Generator.list_gen_mod.select { |s| s[:option] == options.generator }.first
                 Ajd2jkl.say_error("Generator '#{options.generator}' not found") && exit(1) if @generator_def.nil?
-                say "selected generator: #{@generator_def[:name]}"
+                Ajd2jkl.say "selected generator: #{@generator_def[:name]}"
                 @generator = Object::const_get("Ajd2jkl::Generator::#{@generator_def[:module]}")
                 @generator.load
 
@@ -47,7 +45,8 @@ module Ajd2jkl
                 FileUtils.mkpath @output_final unless Dir.exist? @output_final
                 @output = "#{File.expand_path File.dirname @output_final}/.tmp_#{File.basename(@output_final).tr('.', '_')}"
                 FileUtils.mkpath @output unless Dir.exist? @output
-                Ajd2jkl.say "Generate documentation in #{@output_final}"
+                Ajd2jkl.verbose_say "Generate documentation in #{@output_final}"
+                @output
             end
 
             def gen

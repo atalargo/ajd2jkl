@@ -1,0 +1,32 @@
+<nav class="site-nav sidebar animated">
+    <ul>
+      {% assign in_sub = false -%}
+      {% assign start = true -%}
+      {% for node in site.data.sidebar.main -%}
+        {% assign pageurl = page.url | replace: '/index.html', '' | split: "/" -%}
+        {% assign nodeurl = node.url | replace: '/index.html', '' | split: "/" -%}
+        {% if node.level == 1 and start == false -%}
+            {% if in_sub == true -%}
+                {% assign in_sub = false -%}
+                </ul>
+            {% else -%}
+            </li>
+            {% endif -%}
+        {% elsif node.level == 2 and in_sub == false and pageurl[1] == nodeurl[1] -%}
+            <ul class="sublevel">
+        {% endif -%}
+        {% if start == true -%}
+            {% assign start = false -%}
+        {% endif -%}
+        {% if node.level == 1 or (pageurl != '' and pageurl[1] == nodeurl[1]) -%}
+            <li>
+              <a class="sidebar-nav-item {% if pageurl == nodeurl -%} active {% endif -%} level{{ node.level }}" href="{{ node.url | relative_url }}">{{ node.name }}{% if node.type -%}<span class="endpoint {{node.type}}"></span>{% endif -%}</a>
+              {% if node.level == 2 -%}
+                {% assign in_sub = true -%}
+                </li>
+              {% endif -%}
+        {% endif -%}
+      {% endfor -%}
+    </ul>
+
+</nav>

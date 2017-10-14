@@ -39,6 +39,7 @@ Display:
    genlist List all available generators and exit
    help    Display global or [command] help documentation
    parse   Parse the sources in given directories and generate the doc
+   serve  Parse the sources in given directories and generate the doc
 
  GLOBAL OPTIONS:
 
@@ -62,54 +63,54 @@ Display:
 
 ```bash
 
-  NAME:
+NAME:
 
-    parse
+  parse
 
-  SYNOPSIS:
+SYNOPSIS:
 
-    ajd2jkl parse [options] [src_dir ..]
+  ajd2jkl parse [options] [src_dir ..]
 
-  DESCRIPTION:
+DESCRIPTION:
 
-    Parse the sources in given directories and generate the doc
+  Parse the sources in given directories and generate the doc
 
-  OPTIONS:
+OPTIONS:
 
-    --dry-run
-        Only parse don't generate the doc
+  --dry-run
+      Only parse don't generate the doc
 
-    --debug
-        Debug mode
+  --debug
+      Debug mode
 
-    --output STRING
-        Output directory default is './doc'
+  --output STRING
+      Output directory default is './doc'
 
-    --imgs STRING
-        Images directory to import
+  --imgs STRING
+      Images directory to import
 
-    --config STRING
-        Configuration file. Json or YAML format
+  --config STRING
+      Configuration file. Json or YAML format
 
-    --generator STRING
-        Type of generate to use: Jekyll (default), swagger, etc. See command genlist for list of available generators
+  --generator STRING
+      Type of generate to use: Jekyll (default), swagger, etc. See command genlist for list of available generators
 ```
 
 Sub command `genlist`
 ```ajd2jkl genlist --help```
 
 ```bash
-NAME:
+  NAME:
 
-  genlist
+    genlist
 
-SYNOPSIS:
+  SYNOPSIS:
 
-  ajd2jkl genlist
+    ajd2jkl genlist
 
-DESCRIPTION:
+  DESCRIPTION:
 
-  List all available generators and exit
+    List all available generators and exit
 ```
 
 Current output of `genlist`
@@ -121,6 +122,28 @@ Available generators are:
 - Jekyll: Use Jekyll to generate a static documentation website, option: jekyll
 
 Default generator is Jekyll
+```
+
+Sub command `serve`
+```ajd2jkl serve --help```
+
+```bash
+  NAME:
+
+    serve
+
+  SYNOPSIS:
+
+    ajd2jkl serve [options]
+
+  DESCRIPTION:
+
+    Parse the sources in given directories and generate the doc
+
+  OPTIONS:
+
+    --output STRING
+        Output directory default is './doc'
 ```
 
 ## Development

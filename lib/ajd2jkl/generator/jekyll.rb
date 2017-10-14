@@ -10,9 +10,8 @@ module Ajd2jkl
             end
 
             def self.load
-                require 'ajd2jkl/generator/jekyll/config'
-                require 'ajd2jkl/generator/jekyll/layout'
                 require 'ajd2jkl/generator/jekyll/nav'
+                require 'ajd2jkl/generator/jekyll/jerb'
             end
 
             def self.gen(config, options, content_parser, output_final, output)
@@ -30,15 +29,39 @@ module Ajd2jkl
             protected
 
             def self.jekyllize
-                Ajd2jkl.verbose_say 'Launch jekyll create...'
-                `bundle exec jekyll new #{@@output} --force`
-                Ajd2jkl.say_error 'Error during jekyll creation' && exit(1) unless $?.exitstatus.zero?
-                File.open("#{@@output}/_config.yml", 'w') { |f| f << Jekyll.get_config(@@config, @@output, @@output_final) }
-                FileUtils.mkpath "#{@@output}/_layouts/"
-                FileUtils.mkpath "#{@@output}/_includes/"
+                Ajd2jkl.say 'Create jekyll tree from template...'
+                # `bundle exec jekyll new #{@@output} --force`
+                jerb = Ajd2jkl::Generator::Jekyll::Jerb.new @@config, @@options, @@output, @@output_final
+                FileUtils.mkpath @@output
+                begin
+                    basedir = File.dirname(__FILE__) + '/jekyll/template/'
+                    Dir.entries(basedir).each do |file|
+                        next if ['.', '..'].include? file
+                        file = File.expand_path(basedir + file)
+                        if File.directory?(file)
+                            Ajd2jkl.verbose_say "Copy directory #{file}... "
+                            FileUtils.cp_r file, "#{@@output}/"
+                        elsif File.extname(file) == '.erb'
+                            Ajd2jkl.verbose_say "Build from erb #{File.basename(file, '.erb')}... "
+                            File.open("#{@@output}/#{File.basename(file, '.erb')}", 'w') { |f| f << jerb.build(file) }
+                        else
+                            Ajd2jkl.verbose_say "Copy file #{file}... "
+                            FileUtils.cp file, "#{@@output}/"
+                        end
+                        Ajd2jkl.verbose_say 'OK'
+                    end
+                rescue => e
+                    Ajd2jkl.say_error "Error during jekyll creation: #{e.message}"
+                    Ajd2jkl.say_error e.backtrace.join("\n")
+                    exit 1
+                end
+
+                # File.open("#{@@output}/_config.yml", 'w') { |f| f << Jekyll.get_config(@@config, @@output, @@output_final) }
+                # FileUtils.mkpath "#{@@output}/_layouts/"
+                # FileUtils.mkpath "#{@@output}/_includes/"
                 FileUtils.mkpath "#{@@output}/_api/"
-                File.open("#{@@output}/_layouts/home.html", 'w') { |f| f << Jekyll.layout }
-                File.open("#{@@output}/_includes/nav.html", 'w') { |f| f << Jekyll.navbar_include }
+                # File.open("#{@@output}/_layouts/home.html", 'w') { |f| f << Jekyll.layout }
+                # File.open("#{@@output}/_includes/nav.html", 'w') { |f| f << Jekyll.navbar_include }
                 extra_docs
                 gemfile
             end
@@ -51,7 +74,7 @@ module Ajd2jkl
                 @@content_parser.groups.each_pair do |grpname, entries|
                     nav_group.push name: grpname, burl: Generator.underscore(grpname), level: 1
                     grpdir = @@output + '/_posts/' + Generator.underscore(grpname)
-                    FileUtils.mkpath grpdir unless Dir.exist? grpdir
+                    # FileUtils.mkpath grpdir unless Dir.exist? grpdir
                     entries.each do |ent|
                         nav_group.push name: ent.title, burl: "#{Generator.underscore(grpname)}##{ent.name}", level: 2
                     end
@@ -83,16 +106,27 @@ module Ajd2jkl
                 return unless @@config.key?('header') || @@config.key?('footer')
                 FileUtils.mkpath "#{@@output}/_documentations/"
                 base_dir = File.expand_path File.dirname @@options.config
-                FileUtils.cp "#{base_dir}/#{@@config['header']['filename']}", "#{@@output}/_documentations/#{File.basename @@config['header']['filename']}" if @@config.key?('header') && @@config['header'].key?('filename')
-                FileUtils.cp "#{base_dir}/#{@@config['footer']['filename']}", "#{@@output}/_documentations/#{File.basename @@config['footer']['filename']}" if @@config.key?('footer') && @@config['footer'].key?('filename')
+                if @@config.key?('header') && @@config['header'].key?('filename')
+                    extra_doc base_dir, @@config['header']['filename'], '/index.html'
+                end
+                if @@config.key?('footer') && @@config['footer'].key?('filename')
+                    extra_doc base_dir, @@config['footer']['filename'], File.basename(@@config['footer']['filename'], '.*')
+                end
             end
 
             def self.images
-                FileUtils.copy_entry File.expand_path(@@options.imgs), "#{@@output}/images", false, false, true if @@options.imgs
+                FileUtils.copy_entry File.expand_path(@@options.imgs), "#{@@output}/img", false, false, true if @@options.imgs
             end
 
             def self.clean
                 FileUtils.remove_dir @@output
+            end
+
+            def self.extra_doc base_dir, filename, permalink
+                File.open("#{@@output}/#{File.basename filename}", 'w') do |f|
+                    f << "---\ntitle: #{File.basename filename, '.*'}\nlayout: default\npermalink: /#{permalink}.html\n---\n\n"
+                    f << File.read("#{base_dir}/#{filename}")
+                end
             end
         end
     end

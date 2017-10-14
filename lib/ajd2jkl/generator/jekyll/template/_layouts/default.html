@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+        <meta title="{{site.title}} - {{page.title}}" />
+		<meta name="viewport" content="initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <link rel="icon" href="img/favicon.ico" />
+		<link rel="stylesheet" href="/css/style.css" />
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+        <script src="/js/turbolinks.js" charset="utf-8"></script>
+		<script src="/js/main.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1>
+				<a href="/"><img src="/img/logo.png" height="40" alt="{{ site.title }} logo"></a>
+				<button type="button" class="open-nav" id="open-nav"></button>
+			</h1>
+
+			<form action="/search/" method="get">
+				<input type="text" name="q" id="search-input" placeholder="Search">
+				<input type="submit" value="Search" style="display: none;">
+			</form>
+
+			{% include nav.html %}
+
+			<p class="copyright">
+
+			</p>
+		</header>
+		<div class="main">
+            <section class="doc-content">
+                <section class="left-docs animated">
+            		<h3>
+            			<a id="{{ page.id | replace: '/', '' | replace: '.', '' }}">
+            				{{ page.title }}
+            				{% if page.type %}
+            					<span class="endpoint {{ page.type }}"></span>
+            				{% endif %}
+            			</a>
+            		</h3>
+            		{% if page.description %}
+            			<p class="description">{{page.description}}</p>
+            		{% endif %}
+
+            		{{ content | anchor_2_link }}
+                </section>
+
+        	    {% if page.right_code %}
+                    <section class="right-code animated">
+        	              {{ page.right_code | markdownify }}
+                    </section>
+               {% endif %}
+            </section>
+		</div>
+	</body>
+</html>

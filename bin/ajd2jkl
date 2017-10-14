@@ -31,7 +31,7 @@ Commander.configure do
         c.option '--generator STRING', String, 'Type of generate to use: Jekyll (default), swagger, etc. See command genlist for list of available generators'
 
         c.action do |args, options|
-            options.default = { output: './doc', dry_run: false, generator: 'jekyll' }
+            options.default({ output: './doc', dry_run: false, generator: 'jekyll' })
             if args.count.zero?
                 say("<%= color('You should give at least one source directy', :red) %>")
                 command(:help).run(['parse'])
@@ -41,6 +41,29 @@ Commander.configure do
             config = Ajd2jkl::Config.new(options.config).extract if options.config
             a2j = Ajd2jkl::Base.new options, config
             a2j.launch args
+        end
+    end
+
+    command :serve do |c|
+        c.syntax = 'ajd2jkl serve [options]'
+        c.description = 'Parse the sources in given directories and generate the doc'
+        c.option '--output STRING', String, 'Output directory default is \'./doc\''
+
+        c.action do |_args, options|
+            options.default({ output: './doc', dry_run: false, generator: 'jekyll' })
+            config = {}
+            config = Ajd2jkl::Config.new(options.config).extract if options.config
+            dir = Ajd2jkl::Generator::Base.new(options, config, nil).output_dir
+            IO.pipe do |read_pipe, write_pipe|
+                fork do
+                    `cd #{dir} && bundle exec jekyll serve --no-watch --verbose`
+                end
+                write_pipe.close
+                while line = read_pipe.gets
+                    puts "Jekyll serve: #{line}"
+                end
+            end
+
         end
     end
 

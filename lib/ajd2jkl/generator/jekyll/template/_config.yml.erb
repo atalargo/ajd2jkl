@@ -1,0 +1,64 @@
+
+title: <%= @site[:title] %>
+email: <%= @site.email %>
+description: >- # this means to ignore newlines until "baseurl:"
+  <%= @site.description %>
+
+url: "<%= @site.url %>" # the base hostname & protocol for your site, e.g. http://example.com
+
+source: <%= @source_dir %>
+destination: <%= @destination_dir %>
+
+data_dir: _data
+includes: _includes
+collections:
+    api:
+        output: true
+        position: 1
+#     documentations:
+<% unless @header.nil? -%>
+#         <%= File.basename @header.filename.strip -%>:
+#             title: '<%= @header.title %>'
+#             permalink: /index.html
+#             layout: default
+#             output: true
+<% end -%>
+<% unless @footer.nil? -%>
+#         <%= File.basename @footer.filename.strip -%>:
+#             title: '<%= @footer.title %>'
+#             permalink: /<%= File.basename(@footer.filename, '.*')-%>/index.html
+#             layout: default
+#             output: true
+<% end -%>
+
+
+<% unless @header.nil? -%>
+# header:
+#     - title: '<%= @header.title %>'
+#     - content: '_documentations/<%= File.basename @header.filename %>'
+<% end -%>
+<% unless @footer.nil? -%>
+# footer:
+#     - title: '<%= @footer.title %>'
+#     - content: '_documentations/<%= File.basename @footer.filename %>'
+<% end -%>
+
+permalink: pretty
+defaults:
+  -
+    scope:
+      path: ""
+      type: api
+    values:
+      layout: default
+
+# Build settings
+markdown: kramdown
+# theme: jekyll-theme-hydejack
+plugins:
+    - replace_regex
+
+# redcarpet:
+#   extensions:
+#     - smart
+#     - tables
