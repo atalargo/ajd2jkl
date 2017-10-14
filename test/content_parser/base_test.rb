@@ -3,7 +3,7 @@ require 'test_helper'
 class ContentParserBaseTest < Minitest::Test
     def test_that_has_auto_define_some_methods
         @keys = %w[
-            uses deprecteds descriptions errors groups
+            uses deprecateds descriptions errors groups
             error_examples headers header_examples params
             param_examples permissions privates sample_requests
             successs success_examples versions
