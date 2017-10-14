@@ -6,7 +6,7 @@ module Ajd2jkl
             attr_reader :analyzed, :title
 
             @@keynames = %w[
-                uses deprecteds descriptions errors groups
+                uses deprecateds descriptions errors groups
                 error_examples headers header_examples params
                 param_examples permissions privates sample_requests
                 successs success_examples versions

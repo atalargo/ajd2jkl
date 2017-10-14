@@ -12,7 +12,7 @@ module Ajd2jkl
             end
 
             def search_api_name(line)
-                m = /^\s*\*\s*@apiName\s*(?<apiname>\w*)/.match(line)
+                m = /^\s*\*\s*@apiName\s*(?<apiname>[-\w]*)/.match(line)
                 return m[:apiname] if m
                 nil
             end

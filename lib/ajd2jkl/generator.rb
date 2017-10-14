@@ -19,8 +19,8 @@ module Ajd2jkl
                 entry = entry.sub(/\.rb$/, '')
                 require "ajd2jkl/generator/#{entry}"
                 module_name = entry.split('_').collect(&:capitalize).join
-                m = Object::const_get("Ajd2jkl::Generator::#{module_name}")
-                {option: entry, name: m.name, description: m.description, module: module_name}
+                m = Object.const_get("Ajd2jkl::Generator::#{module_name}")
+                { option: entry, name: m.name, description: m.description, module: module_name }
             end
         end
 
@@ -51,7 +51,7 @@ module Ajd2jkl
             end
 
             def gen
-                @generator.gen(@config, @content_parser, @output_final, @output)
+                @generator.gen(@config, @options, @content_parser, @output_final, @output)
             end
         end
 

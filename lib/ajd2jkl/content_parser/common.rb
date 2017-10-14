@@ -27,7 +27,7 @@ module Ajd2jkl
             def self.check(line)
                 if /^\s*\*\s*@api(?<found_common>#{@names.join('|')})\s/ =~ line
                     found_common = $~[:found_common]
-                    c = Object::const_get("::Ajd2jkl::ContentParser::CommonContent::#{found_common}").new(line.sub($~[0], ''))
+                    c = Object.const_get("::Ajd2jkl::ContentParser::CommonContent::#{found_common}").new(line.sub($~[0], ''))
                     return c
                 end
                 false
