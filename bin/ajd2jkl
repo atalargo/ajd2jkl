@@ -28,10 +28,11 @@ Commander.configure do
         c.option '--output STRING', String, 'Output directory default is \'./doc\''
         c.option '--imgs STRING', String, 'Images directory to import'
         c.option '--config STRING', String, 'Configuration file. Json or YAML format'
-        c.option '--generator STRING', String, 'Type of generate to use: Jekyll (default), swagger, etc. See command genlist for list of available generators'
+        c.option '--generator STRING', String, "Type of generate to use: Jekyll (default), swagger, etc. \
+See command genlist for list of available generators"
 
         c.action do |args, options|
-            options.default({ output: './doc', dry_run: false, generator: 'jekyll' })
+            options.default(output: './doc', dry_run: false, generator: 'jekyll')
             if args.count.zero?
                 say("<%= color('You should give at least one source directy', :red) %>")
                 command(:help).run(['parse'])
@@ -50,7 +51,7 @@ Commander.configure do
         c.option '--output STRING', String, 'Output directory default is \'./doc\''
 
         c.action do |_args, options|
-            options.default({ output: './doc', dry_run: false, generator: 'jekyll' })
+            options.default(output: './doc', dry_run: false, generator: 'jekyll')
             config = {}
             config = Ajd2jkl::Config.new(options.config).extract if options.config
             dir = Ajd2jkl::Generator::Base.new(options, config, nil).output_dir
@@ -59,7 +60,7 @@ Commander.configure do
                 exit!
             end
             jk = IO.popen("cd #{dir} && bundle exec jekyll serve --no-watch --skip-initial-build", err: %i[child out])
-            while line = jk.gets
+            while (line = jk.gets)
                 next if /^(Configuration file:|\s*Auto-regeneration:|\s*.*Build Warning:)/ =~ line
                 print line
             end
