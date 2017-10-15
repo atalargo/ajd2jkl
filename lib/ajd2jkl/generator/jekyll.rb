@@ -73,14 +73,19 @@ module Ajd2jkl
                 nav_group = []
                 @@content_parser.groups.each_pair do |grpname, entries|
                     nav_group.push name: grpname, burl: Generator.underscore(grpname), level: 1
-                    grpdir = @@output + '/_posts/' + Generator.underscore(grpname)
+                    # grpdir = @@output + '/_posts/' + Generator.underscore(grpname)
                     # FileUtils.mkpath grpdir unless Dir.exist? grpdir
                     entries.each do |ent|
-                        nav_group.push name: ent.title, burl: "#{Generator.underscore(grpname)}##{ent.name}", level: 2
+                        version = if ent.versions.nil? || ent.versions.empty?
+                                      ''
+                                  else
+                                      "?v=#{ent.versions.first.version}"
+                                  end
+                        nav_group.push name: ent.title, burl: "#{Generator.underscore(grpname)}#{version}##{ent.name}", level: 2
                     end
                 end
                 FileUtils.mkpath "#{@@output}/_data/"
-                File.open("#{@@output}/_data/sidebar.yml", "w") {|f| f << Jekyll.navbar(@@config, nav_group) }
+                File.open("#{@@output}/_data/sidebar.yml", 'w') { |f| f << Jekyll.navbar(@@config, nav_group) }
             end
 
             def self.jekyll_build

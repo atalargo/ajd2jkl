@@ -13,7 +13,7 @@ module Ajd2jkl
         def self.scan(file)
             @return = { define: [], entry: [] }
             begin
-                @f = File.open((@current_file = file))
+                @f = File.open((@current_file = File.expand_path(file)))
                 @f.readlines.each_with_index do |line, idx|
                     parse_line(line, idx + 1)
                 end

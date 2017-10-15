@@ -54,16 +54,15 @@ Commander.configure do
             config = {}
             config = Ajd2jkl::Config.new(options.config).extract if options.config
             dir = Ajd2jkl::Generator::Base.new(options, config, nil).output_dir
-            IO.pipe do |read_pipe, write_pipe|
-                fork do
-                    `cd #{dir} && bundle exec jekyll serve --no-watch --verbose`
-                end
-                write_pipe.close
-                while line = read_pipe.gets
-                    puts "Jekyll serve: #{line}"
-                end
+            trap('SIGINT') do
+                print "\nBye bye...\n"
+                exit!
             end
-
+            jk = IO.popen("cd #{dir} && bundle exec jekyll serve --no-watch --skip-initial-build", err: %i[child out])
+            while line = jk.gets
+                next if /^(Configuration file:|\s*Auto-regeneration:|\s*.*Build Warning:)/ =~ line
+                print line
+            end
         end
     end
 
