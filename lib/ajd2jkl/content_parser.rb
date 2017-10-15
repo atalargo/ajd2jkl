@@ -3,7 +3,10 @@ require 'weakref'
 
 module Ajd2jkl
     module ContentParser
+        # class Parser
         class Parser
+            attr_reader :defines, :entries
+
             def initialize(options, config)
                 @verbose = options.verbose
                 @order = config.key?('order') ? config['order'] : nil

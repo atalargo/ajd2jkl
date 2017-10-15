@@ -53,16 +53,5 @@ module Ajd2jkl
                 @generator.gen(@config, @options, @content_parser, @output_final, @output)
             end
         end
-
-        def self.underscore(camel_cased_word)
-            return camel_cased_word unless /[-A-Z ]|::/.match(camel_cased_word)
-            word = camel_cased_word.to_s.gsub('::'.freeze, '/'.freeze)
-            word.gsub!(/(?:(?<=([A-Za-z\d]))|\b)()(?=\b|[^a-z])/) { "#{$1 && '_'.freeze }#{$2.downcase}" }
-            word.gsub!(/([A-Z\d]+)([A-Z][a-z])/, '\1_\2'.freeze)
-            word.gsub!(/([a-z\d])([A-Z])/, '\1_\2'.freeze)
-            word.tr!('-'.freeze, '_'.freeze)
-            word.downcase!
-            word
-        end
     end
 end

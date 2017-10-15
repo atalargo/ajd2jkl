@@ -67,12 +67,122 @@ module Ajd2jkl
             end
 
             def self.gen_defines
+                @@extra_defines = {}
+                @@content_parser.defines.each_pair do |name, define|
+                    extract_define(name, define)
+                end
+                @@extra_defines.each_pair do |name, define|
+                    extract_define(name, define)
+                end
+            end
+
+            def self.extract_define(name, define)
+                front_matter = {}
+                content = ''
+                p define
+                nodescription = false
+                if define.is_a? Ajd2jkl::ContentParser::Define
+                    front_matter[:name] = name
+                    if define.errors?
+                        define.errors.each do |error|
+                            front_matter[:group] = error.group
+                            content << "<tr><td>#{error.field}</td><td>#{error.description}</td></tr>\n"
+                        end
+                    end
+                    if define.params?
+                        front_matter[:params] = []
+                        define.params.each do |param|
+                            front_matter[:params].push 'p-' + param.field.gsub('.', '_')
+                            @@extra_defines["#{name}-#{'p-' + param.field.gsub('.', '_')}"] = param
+                        end
+                    end
+                    if define.successs?
+                        front_matter[:success] = []
+                        define.successs.each do |success|
+                            front_matter[:success].push 's-' + success.field.gsub('.', '_')
+                            @@extra_defines["#{name}-#{'s-' + success.field.gsub('.', '_')}"] = success
+                        end
+                    end
+                    if define.headers?
+                        front_matter[:success] = []
+                        define.headers.each do |header|
+                            front_matter[:headers].push 'h-' + header.field.gsub('.', '_')
+                            @@extra_defines["#{name}-#{'h-' + header.field.gsub('.', '_')}"] = header
+                        end
+                    end
+                    if define.success_examples?
+                        front_matter[:success_examples] = []
+                        define.success_examples.each do |success_example|
+                            pname = success_example.title.gsub(/[^\w\s]/, '').strip.underscore
+                            front_matter[:success_examples].push pname
+                            @@extra_defines["#{name}-#{pname}"] = success_example
+                        end
+                    end
+                    if define.param_examples?
+                        front_matter[:param_examples] = []
+                        define.param_examples.each do |param_example|
+                            pname = param_example.title.gsub(/[^\w\s]/, '').strip.underscore
+                            front_matter[:param_examples].push pname
+                            @@extra_defines["#{name}-#{pname}"] = param_example
+                        end
+                    end
+                    if define.error_examples?
+                        front_matter[:param_examples] = []
+                        define.param_examples.each do |param_example|
+                            pname = param_example.title.gsub(/[^\w\s]/, '').strip.underscore
+                            front_matter[:param_examples].push pname
+                            @@extra_defines["#{name}-#{pname}"] = param_example
+                        end
+                    end
+                    if define.header_examples?
+                        front_matter[:param_examples] = []
+                        define.param_examples.each do |param_example|
+                            pname = param_example.title.gsub(/[^\w\s]/, '').strip.underscore
+                            front_matter[:param_examples].push pname
+                            @@extra_defines["#{name}-#{pname}"] = param_example
+                        end
+                    end
+                else
+                    case define
+                    when Ajd2jkl::ContentParser::CommonContent::AbstractParametrable
+                        front_matter[:group] = define.group unless define.group.nil?
+                        front_matter[:field] = define.field
+                        front_matter[:optional] = define.optional?
+                        front_matter[:default_value] = define.default_value unless define.default_value.nil?
+                        front_matter[:type] = define.type
+                    when Ajd2jkl::ContentParser::CommonContent::AbstractExample
+                        front_matter[:title] = define.title
+                        front_matter[:type]  = define.type
+                        front_matter[:right_code] = <<EOF
+  ~~~ #{define.type}
+  #{define.description.split("\n").map {|line| "  #{line}"}.join("\n")}
+  ~~~
+  {: title="#{define.title}" }
+EOF
+                        nodescription = true
+                    end
+                end
+                content << define.description << (define.description.end_with?("\n") ? '' : "\n") << "\n" unless define.description.nil? || define.description.empty? || nodescription
+                File.open("#{File.expand_path @@output}/_includes/#{name}.md", 'w') do |f|
+                    fm = front_matter.map do |pair|
+                        b = "#{pair[0]}: "
+                        b += " |\n" if pair[0] == :right_code
+                        b += if pair[1].is_a? Array
+                                 "\n" + pair[1].map {|e| "  - #{e}"}.join("\n")
+                             elsif pair[1].is_a? Hash
+                                 pair[1].map {|e| "  #{e[0]}: #{e[1]}"}.join("\n")
+                             else
+                                 "#{pair[1]}"
+                             end
+                    end.join("\n")
+                    f << "---\n#{fm}\n---\n\n" << content
+                end
             end
 
             def self.gen_group
                 nav_group = []
                 @@content_parser.groups.each_pair do |grpname, entries|
-                    nav_group.push name: grpname, burl: Generator.underscore(grpname), level: 1
+                    nav_group.push name: grpname, burl: grpname.underscore, level: 1
                     # grpdir = @@output + '/_posts/' + Generator.underscore(grpname)
                     # FileUtils.mkpath grpdir unless Dir.exist? grpdir
                     entries.each do |ent|
@@ -81,7 +191,7 @@ module Ajd2jkl
                                   else
                                       "?v=#{ent.versions.first.version}"
                                   end
-                        nav_group.push name: ent.title, burl: "#{Generator.underscore(grpname)}#{version}##{ent.name}", level: 2
+                        nav_group.push name: ent.title, burl: "#{grpname.underscore}#{version}##{ent.name}", level: 2
                     end
                 end
                 FileUtils.mkpath "#{@@output}/_data/"

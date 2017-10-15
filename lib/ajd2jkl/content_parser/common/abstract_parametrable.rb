@@ -5,11 +5,15 @@ module Ajd2jkl
             # multiline: true
             # @api(Error|Success|Param) [[(group)] [{type}] field [description]
             class AbstractParametrable < AbstractCommonMultiline
-                attr_reader :group, :type, :field, :description
+                attr_reader :group, :type, :description, :optional, :default_value
 
                 def optional?
-                    raise "Undefined field" unless @field
-                    !!(/^\[\s*\]$/ =~ @field)
+                    raise 'Undefined field' unless @field
+                    !!(/^\[[^\]]*\]$/ =~ @field)
+                end
+
+                def field
+                    @field.gsub(/([\[\]\(\)\{\}]|=.*$)/, '')
                 end
 
                 def end_multiline

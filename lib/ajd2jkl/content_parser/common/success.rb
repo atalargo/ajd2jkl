@@ -36,6 +36,8 @@ module Ajd2jkl
                     @group = match[:group] unless match[:group].nil? || match[:group].strip == ''
                     @type = match[:type] unless match[:type].nil? || match[:type].strip == ''
                     @field = match[:field]
+                    md = /\=(?<defvalue>.*)$/.match @field
+                    @default_value = md[:defvalue].strip unless md.nil? || md[:defvalue].strip == ''
                     @description = match[:description] unless match[:description].nil?
                     Ajd2jkl.debug("Success Line `#{@raw}`")
                     @raw = nil

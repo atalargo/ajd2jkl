@@ -2,12 +2,11 @@ module Ajd2jkl
     module ContentParser
         module CommonContent
             # Common apiHeader parser
-            # multiline: false
+            # multiline: true
             # @apiHeader [(group)] [{type}] [field=defaultValue] [description]
-            class Header < AbstractCommon
-                attr_reader :group, :type, :field, :description
-
+            class Header < AbstractParametrable
                 # test regexp http://rubular.com/r/l9BCILbz8K
+
                 @@parser = %r{
                     ^
                     (\((?<group>\w[-\w\s]*)\)\s)?\s*
@@ -30,6 +29,8 @@ module Ajd2jkl
                     @group = match[:group] unless match[:group].nil? || match[:group].strip == ''
                     @type = match[:type] unless match[:type].nil? || match[:type].strip == ''
                     @field = match[:field]
+                    md = /\=(?<defvalue>.*)$/.match @field
+                    @default_value = md[:defvalue].strip unless md.nil? || md[:defvalue].strip == ''
                     @description = match[:description] unless match[:description].nil?
                     Ajd2jkl.verbose_say(" Found Header `#{@field}`#{@type ? ' of type '+@type : ''}#{@group ? " in group `#{@group}`" : ''}")
                     @raw = nil

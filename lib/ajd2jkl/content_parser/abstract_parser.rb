@@ -3,7 +3,7 @@ require 'ajd2jkl/content_parser/common'
 module Ajd2jkl
     module ContentParser
         class AbstractParser
-            attr_reader :analyzed, :title
+            attr_reader :analyzed, :title, :description
 
             @@keynames = %w[
                 uses deprecateds descriptions errors groups

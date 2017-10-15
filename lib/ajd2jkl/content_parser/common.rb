@@ -50,7 +50,7 @@ module Ajd2jkl
                 end
 
                 def family
-                    return @family = (self.class.to_s.sub('Ajd2jkl::ContentParser::CommonContent::', '').downcase + 's').to_sym unless @family
+                    return @family = (self.class.to_s.sub('Ajd2jkl::ContentParser::CommonContent::', '').underscore + 's').to_sym unless @family
                     @family
                 end
 
