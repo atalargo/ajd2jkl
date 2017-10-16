@@ -20,6 +20,7 @@ module Ajd2jkl
                 gen_defines
                 gen_group
                 images
+                gen_entries
 
                 jekyll_build
                 # clean
@@ -83,6 +84,7 @@ module Ajd2jkl
                 nodescription = false
                 if define.is_a? Ajd2jkl::ContentParser::Define
                     front_matter[:name] = name
+                    front_matter[:title] = define.title unless define.title.nil?
                     if define.errors?
                         define.errors.each do |error|
                             front_matter[:group] = error.group
@@ -180,22 +182,150 @@ EOF
             end
 
             def self.gen_group
-                nav_group = []
+                nav_group = {}
                 @@content_parser.groups.each_pair do |grpname, entries|
-                    nav_group.push name: grpname, burl: grpname.underscore, level: 1
-                    # grpdir = @@output + '/_posts/' + Generator.underscore(grpname)
-                    # FileUtils.mkpath grpdir unless Dir.exist? grpdir
+                    nav_group[grpname.underscore] = { name: grpname, burl: grpname.underscore, level: 1 }
+                    grpdir = @@output + '/_api/' + grpname.underscore
+                    FileUtils.mkpath grpdir unless Dir.exist? grpdir
                     entries.each do |ent|
-                        version = if ent.versions.nil? || ent.versions.empty?
-                                      ''
-                                  else
-                                      "?v=#{ent.versions.first.version}"
-                                  end
-                        nav_group.push name: ent.title, burl: "#{grpname.underscore}#{version}##{ent.name}", level: 2
+                        burl = "#{grpname.underscore}/#{ent.name}#api-#{grpname.underscore}-#{ent.name}"
+                        next if nav_group.key? burl
+                        nav_group[burl] = { name: ent.title, burl: burl, level: 2, type: ent.httpmethod }
                     end
                 end
                 FileUtils.mkpath "#{@@output}/_data/"
-                File.open("#{@@output}/_data/sidebar.yml", 'w') { |f| f << Jekyll.navbar(@@config, nav_group) }
+                File.open("#{@@output}/_data/sidebar.yml", 'w') { |f| f << Jekyll.navbar(@@config, nav_group.values) }
+            end
+
+            def self.gen_entries
+                max_version = {}
+                recolted_datas = {}
+                recolted_versions = {}
+                @@content_parser.entries.each_pair do |group, version_entries|
+                    recolted_datas[group] = {}
+                    version_entries.each_pair do |version, entries|
+                        recolted_datas[group][version] = {}
+                        entries.each_pair do |name, entry|
+                            p "Generate entry #{group} - #{version} - #{name} => #{entry.title}"
+                            front_matter = {
+                                id: name,
+                                title: "\"#{entry.title}\"",
+                                apipath: entry.path,
+                                group: group,
+                                type: entry.httpmethod
+                            }
+                            # position: 1.1
+                            gpname = "#{group}---#{name}"
+                            cver = version
+                            recolted_versions[gpname] = [] unless recolted_versions.key? gpname
+                            recolted_versions[gpname].push version
+                            if @@content_parser.entries[group].keys.count == 1
+                                cver = ''
+                            else
+                                max_version[gpname] = version unless max_version.key?(gpname)
+                                max_version[gpname] = version if max_version[gpname] < version
+                                front_matter[:version] = version
+                            end
+                            recolted_datas[group][version][name] = {front_matter: front_matter, cver: cver, gpname: gpname}
+                        end
+                    end
+                end
+                recolted_datas.each_pair do |group, version_entries|
+                    version_entries.each_pair do |version, entries|
+                        entries.each_pair do |name, recolted_data|
+                            permalink = "/#{group}/#{recolted_data[:cver] == '' ? '' : recolted_data[:cver]+'/'}"
+                            unless recolted_data[:cver].empty?
+                                recolted_data[:front_matter][:allversions] = recolted_versions[recolted_data[:gpname]]
+                            end
+                            recolted_data[:front_matter][:permalink] = "#{permalink}#{name}.html"
+                            subdir = "#{@@output}/_api/#{permalink}"
+                            FileUtils.mkpath subdir unless Dir.exist? subdir
+                            File.open("#{subdir}/#{name}.md", 'w') do |f|
+                                fm = recolted_data[:front_matter].map do |pair|
+                                    b = "#{pair[0]}: "
+                                    b += " |\n" if pair[0] == :right_code
+                                    b += if pair[1].is_a? Array
+                                             "\n" + pair[1].map {|e| "  - #{e}"}.join("\n")
+                                         elsif pair[1].is_a? Hash
+                                             pair[1].map {|e| "  #{e[0]}: #{e[1]}"}.join("\n")
+                                         else
+                                             "#{pair[1]}"
+                                         end
+                                end.join("\n")
+                                f << "---\n#{fm}\n---\n\n"
+                            end
+                        end
+                    end
+                end
+                generate_group_maxversion(max_version)
+                generate_groups_index
+            end
+
+            def self.generate_group_maxversion(max_version)
+                max_version.each_pair do |gpname, maxversion|
+                    gn = gpname.split('---')
+                    basepermalink = "/#{gn[0]}/#{gn[1]}"
+                    base_dir = "#{@@output}/_api/#{gn[0]}"
+                    versions = Dir.entries(base_dir)
+                    File.open("#{@@output}/_api/#{gn[0]}/#{maxversion}/#{gn[1]}.md", 'r') do |fromfile|
+                        File.open("#{@@output}/_api#{basepermalink}.md", 'w') do |f|
+                            fromfile.readlines.each do |l|
+                                f << ( /^permalink: / =~ l ? "permalink: #{basepermalink}.html\n" : l)
+                            end
+                        end
+                    end
+                    versions.each do |v|
+                        next if ['.', '..'].include? v
+                        next unless File.directory? base_dir + '/' + v
+                        Dir.entries(base_dir + '/' + v).each do |fe|
+                            next if ['.', '..'].include? fe
+                            basepermalink = "/#{gn[0]}/#{File.basename fe, '.*'}"
+                            next if File.exist? "#{@@output}/_api#{basepermalink}.md"
+                            File.open("#{@@output}/_api/#{gn[0]}/#{v}/#{fe}", 'r') do |fromfile|
+                                File.open("#{@@output}/_api#{basepermalink}.md", 'w') do |f|
+                                    fromfile.readlines.each do |l|
+                                        f << ( /^permalink: / =~ l ? "permalink: #{basepermalink}.html\n" : l)
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+
+            def self.generate_groups_index
+                @@content_parser.entries.each_pair do |group, _version_entries|
+                    if @@content_parser.defines.key? group
+                        File.open("#{@@output}/_includes/#{group}.md", 'r') do |fromfile|
+                            File.open("#{@@output}/_api/#{group}/index.md", 'w') do |f|
+                                firstfmpassed = false
+                                secondfmpassed = false
+                                fromfile.readlines.each do |l|
+                                    if !secondfmpassed && l == "---\n"
+                                        if firstfmpassed
+                                            f << "id: #{group}\npermalink: /#{group}/index.html\ngroup: #{group}\n"
+                                            secondfmpassed = true
+                                        else
+                                            firstfmpassed = true
+                                        end
+                                    end
+                                    f << l
+                                end
+                            end
+                        end
+                    else
+                        # take the first entries as index
+                        first_entry = @@content_parser.groups[group][0]
+                        next if first_entry.nil?
+                        File.open("#{@@output}/_api/#{group}/#{first_entry.name}.md", 'r') do |fromfile|
+                            File.open("#{@@output}/_api/#{group}/index.md", 'w') do |f|
+                                fromfile.readlines.each do |l|
+                                    f << ( /^permalink: / =~ l ? "permalink: /#{group}/index.html\n" : l)
+                                end
+                            end
+                        end
+                    end
+                end
             end
 
             def self.jekyll_build
@@ -222,7 +352,7 @@ EOF
                 FileUtils.mkpath "#{@@output}/_documentations/"
                 base_dir = File.expand_path File.dirname @@options.config
                 if @@config.key?('header') && @@config['header'].key?('filename')
-                    extra_doc base_dir, @@config['header']['filename'], '/index.html'
+                    extra_doc base_dir, @@config['header']['filename'], 'index'
                 end
                 if @@config.key?('footer') && @@config['footer'].key?('filename')
                     extra_doc base_dir, @@config['footer']['filename'], File.basename(@@config['footer']['filename'], '.*')
@@ -239,7 +369,7 @@ EOF
 
             def self.extra_doc base_dir, filename, permalink
                 File.open("#{@@output}/#{File.basename filename}", 'w') do |f|
-                    f << "---\ntitle: #{File.basename filename, '.*'}\nlayout: default\npermalink: /#{permalink}.html\n---\n\n"
+                    f << "---\nlayout: default\npermalink: /#{permalink}.html\n---\n\n"
                     f << File.read("#{base_dir}/#{filename}")
                 end
             end

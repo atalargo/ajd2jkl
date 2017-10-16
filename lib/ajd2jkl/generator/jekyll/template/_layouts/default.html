@@ -2,7 +2,7 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-        <meta title="{{site.title}} - {{page.title}}" />
+        <meta title="{{site.title}} - {{page.title}} {{page.version}}" />
 		<meta name="viewport" content="initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
         <link rel="icon" href="img/favicon.ico" />
 		<link rel="stylesheet" href="/css/style.css" />
@@ -29,18 +29,25 @@
 			</p>
 		</header>
 		<div class="main">
-            <section class="doc-content">
-                <section class="left-docs animated">
-            		<h3>
-            			<a id="{{ page.id | replace: '/', '' | replace: '.', '' }}">
+            <section class="doc-content {% if page.right_code -%}with-rightcode{% endif -%}">
+                <section class="left-docs animated {% if page.right_code -%}with-rightcode{% endif -%}">
+            		{% if page.title -%}
+                    <h3>
+            			<a id="api-{{page.group}}-{{ page.id | split: '/' | last | replace: '.', '' | replace: 'index', '' }}">
             				{{ page.title }}
-            				{% if page.type %}
-            					<span class="endpoint {{ page.type }}"></span>
+            				{% if page.version %}
+            					<span>v. {{page.version}}</span>
             				{% endif %}
             			</a>
             		</h3>
-            		{% if page.description %}
-            			<p class="description">{{page.description}}</p>
+                    {% endif %}
+            		{% if page.apipath %}
+            			<p id="api-{{page.group}}-{{ page.id | split: '/' | last | replace: '.', '' }}" class="description">
+                            {% if page.type %}
+                                <span class="endpoint {{ page.type }}"></span>
+                            {% endif %}
+                            {{page.apipath}}
+                        </p>
             		{% endif %}
 
             		{{ content | anchor_2_link }}

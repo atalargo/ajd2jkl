@@ -2,7 +2,7 @@ module Ajd2jkl
     module ContentParser
         # parser for Entry annotation (@api)
         class Entry < AbstractParser
-            attr_reader :path, :method
+            attr_reader :path, :httpmethod
 
             protected
 
@@ -32,7 +32,7 @@ module Ajd2jkl
                 raise "Parsing api don't have `path` part (RE: #{API_PARSER}) raw: #{@raw}" unless match && match[:path]
                 raise "Parsing api don't have `method` part (RE: #{API_PARSER}) raw: #{@raw}" unless match && match[:method]
                 @path = match[:path]
-                @method = match[:method]
+                @httpmethod = match[:method]
                 @title = match[:title]
                 Ajd2jkl.verbose_say "Entry has path #{@path} with method #{@method}"
             end

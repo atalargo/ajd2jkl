@@ -9,7 +9,7 @@ module Anchor2Link
             if res[1].start_with?('intro-', 'tutorial-')
                 text = text.sub(res[0], "href=\"/#api-#{res[1]}")
             else
-                text = text.sub(res[0], "href=\"/#{res[1].split('-').join('/')}/#api-#{res[1]}")
+                text = text.sub(res[0], "href=\"/#{res[1].split('-').join('/')}#api-#{res[1]}")
             end
             res = r.match(text, b)
         end

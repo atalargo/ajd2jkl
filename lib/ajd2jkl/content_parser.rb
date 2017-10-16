@@ -52,14 +52,17 @@ module Ajd2jkl
                         else
                             entry.groups[0].name
                         end
-                        @entries[entry.name] = {} unless @entries.key? entry.name
-                        @entries[entry.name][group] = {} unless @entries[entry.name].key? group
-                        if @entries[entry.name][group].key? version
-                            raise "2 entries have the same identifier (name#group#version): #{entry.name}##{group}##{version}. First is located" \
-                                  " #{@entries[entry.name][group][version].from_file}##{@entries[entry.name][group][version].from_line}" \
+                        # @entries[entry.name] = {} unless @entries.key? entry.name
+                        # @entries[entry.name][group] = {} unless @entries[entry.name].key? group
+                        # if @entries[entry.name][group].key? version
+                        @entries[group] = {} unless @entries.key? group
+                        @entries[group][version] = {} unless @entries[group].key? version
+                        if @entries[group][version].key? entry.name
+                            raise "2 entries have the same identifier (group#version#name): #{group}##{version}##{entry.name}. First is located" \
+                                  " #{@entries[group][version][entry.name].from_file}##{@entries[group][version][entry.name].from_line}" \
                                   " and the second #{d.from_file}##{d.from_line}"
                         end
-                        @entries[entry.name][group][version] = entry
+                        @entries[group][version][entry.name] = entry
                     rescue => e
                         Ajd2jkl.say_error "Error raised parsing entry in file #{d.from_file}##{d.from_line}"
                         Ajd2jkl.say_error e.message
