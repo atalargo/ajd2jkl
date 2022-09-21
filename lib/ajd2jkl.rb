@@ -35,7 +35,7 @@ module Ajd2jkl
         def launch(src_dir)
             Commander::UI.color('Warning! Running in dry run mode', :cyan) if @options.dry_run
 
-            say("Parse directories : #{src_dir.join(' ')}")
+            say("Parse directories: #{src_dir.join(' ')}")
             phpfiles = File.join("{#{src_dir.join(',')}}", '**', '*.php')
 
             gob = Glober.new(@options)
@@ -90,7 +90,7 @@ module Commander
 
         # Extends Commender UI ProgressBar class
         class ProgressBar
-            # override show method to don't erase progress bar when finished
+            # override show method to not erase the progress bar when finished
             def show
                 return if finished?
                 erase_line

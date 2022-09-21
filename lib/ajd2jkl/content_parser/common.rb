@@ -21,7 +21,7 @@ module Ajd2jkl
             ].freeze
 
             def initialize
-                raise 'Common is a `static` class. It can\'t be instancied'
+                raise 'Common is a `static` class. It can\'t be instanciated'
             end
 
             def self.check(line)
@@ -62,7 +62,7 @@ module Ajd2jkl
                 end
 
                 def analyze
-                    raise 'This method should be overrided'
+                    raise 'This method should be overridden'
                 end
 
                 protected
@@ -83,7 +83,7 @@ module Ajd2jkl
                 end
 
                 def end_multiline
-                    raise 'This method should be overrided in multiline Common parser'
+                    raise 'This method should be overridden in multiline Common parser'
                 end
 
                 protected

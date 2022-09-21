@@ -21,7 +21,7 @@ module Ajd2jkl
             end
 
             def parse_first_line(line)
-                raise "Method `parse_first_line`should be overrided"
+                raise "Method `parse_first_line` should be overridden"
             end
 
             public
@@ -74,7 +74,7 @@ module Ajd2jkl
             end
 
             def method_missing(methId)
-                raise "Method missing `#{methId.id2name}`" unless respond_to_missing?(methId.id2name)
+                raise "Missing method `#{methId.id2name}`" unless respond_to_missing?(methId.id2name)
                 nmeth = methId.id2name.sub(/\?$/, '')
                 self.class.class_eval %Q{def #{nmeth}? \n @contents.key?(:#{nmeth}) \n end}
                 self.class.class_eval %Q{def #{nmeth} \n @contents[:#{nmeth}] \n end}

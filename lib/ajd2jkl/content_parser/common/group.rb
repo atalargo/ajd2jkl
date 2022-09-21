@@ -8,7 +8,7 @@ module Ajd2jkl
                 attr_reader :name
 
                 def analyze
-                    Ajd2jkl.verbose_say('Analyze Common/Group... ')
+                    Ajd2jkl.verbose_say('Analyzing Common/Group... ')
                     @name = @raw.gsub(/\s/, '')
                     Ajd2jkl.verbose_say("Found appartenance of a group called `#{@name}`")
                     @raw = nil
